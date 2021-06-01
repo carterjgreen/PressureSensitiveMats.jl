@@ -1,8 +1,8 @@
 abstract type Combiner end
 abstract type CorPol <: Combiner end
 
-struct PCC end
-struct SNR_MAX end
+struct PCC <: Combiner end
+struct SNR_MAX <: Combiner end
 struct MRC_PSD <: CorPol end
 struct EGC <: CorPol end
 
