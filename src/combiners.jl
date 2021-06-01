@@ -51,7 +51,7 @@ function get_weights(x::AbstractMatrix{T}, comb::EGC) where T
     return ones(T, size(x, 2))
 end
 
-function combiner(x::AbstractMatrix{T}, comb::Combiner)
+function combiner(x::AbstractMatrix{T}, comb::Combiner) where T
     w = get_weights(x, comb)
     return x * w
 end
