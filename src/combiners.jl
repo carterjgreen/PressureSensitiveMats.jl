@@ -6,6 +6,11 @@ struct SNR_MAX <: Combiner end
 struct MRC_PSD <: CorPol end
 struct EGC <: CorPol end
 
+"""
+    get_weights(x, ref, comb)
+
+Returns the weights for a section of the PSM by the method comb
+"""
 function get_weights(x::AbstractMatrix, ref::Int, comb::PCC, mean=true)
     if mean
         w = w = cor(x, x[:, ref]) |> vec
@@ -51,6 +56,11 @@ function get_weights(x::AbstractMatrix{T}, comb::EGC) where T
     return ones(T, size(x, 2))
 end
 
+"""
+    combiner(x, comb)
+
+Gets weights from comb and applies them to x
+"""
 function combiner(x::AbstractMatrix, comb::Combiner)
     w = get_weights(x, comb)
     return x * w
