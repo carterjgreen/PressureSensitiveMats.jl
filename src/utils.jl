@@ -63,5 +63,3 @@ function sfm(x)
     s = abs2.(fft(x))
     return geomean(s) / mean(s)
 end
-
-"asfsa"
