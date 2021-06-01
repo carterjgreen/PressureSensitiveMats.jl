@@ -60,3 +60,5 @@ function combiner(x::AbstractMatrix, comb::CorPol)
     w = get_weights(x, comb)
     return polarity_flip(x) * w
 end
+
+combiner(x::AbstractMatrix) = combiner(x, SNR_MAX())
