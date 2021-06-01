@@ -51,17 +51,12 @@ function get_weights(x::AbstractMatrix{T}, comb::EGC) where T
     return ones(T, size(x, 2))
 end
 
-function combiner(x::AbstractMatrix{T}, comb::Combiner) where T
+function combiner(x::AbstractMatrix, comb::Combiner)
     w = get_weights(x, comb)
     return x * w
 end
 
-function combiner(x::AbstractMatrix{T}, comb::CorPol)
-    w = get_weights(x, comb)
-    return polarity_flip(x) * w
-end
-
-function combiner(x::AbstractMatrix{T}, comb::CorPol)
+function combiner(x::AbstractMatrix, comb::CorPol)
     w = get_weights(x, comb)
     return polarity_flip(x) * w
 end

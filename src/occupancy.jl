@@ -15,7 +15,7 @@ end
 
 function breath_availability(x::AbstractArray{T, 3}) where T
     # Needs unfiltered data in a 9x8xN format in the proper order
-    out = Vector{Float64}(undef, size(x, 3))
+    out = Vector{T}(undef, size(x, 3))
     for i in eachindex(out)
         active = findall(view(x, :, :, i) .> (2046 * 0.4))
         if !isempty(active)
