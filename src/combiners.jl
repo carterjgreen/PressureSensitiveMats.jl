@@ -10,7 +10,7 @@ struct MRC_PSD <: CorPol
     fs:Int
 end
 
-MRC(fs=10) = MRC_PSD(fs)
+MRC_PSD(fs=10) = MRC_PSD(fs)
 
 """
     get_weights(x, ref, comb)
