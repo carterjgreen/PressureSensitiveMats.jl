@@ -3,11 +3,12 @@ module PressureSensitiveMats
 using Distances, DSP, FFTW, Peaks, StatsBase, Statistics
 
 export est_br, est_br_fft, est_br_fft2
-export PCC, SNR_MAX, EGC, MRC_PSD, get_weights, combiner
+export PCC, PCC2, SNR_MAX, EGC, MRC_PSD, get_weights, combiner
 export move_detect
 export active_sensors,
        apply2seg,
        choose_ref,
+       estimate_snr,
        mat_shape, 
        moving_stats,
        polarity_flip,
