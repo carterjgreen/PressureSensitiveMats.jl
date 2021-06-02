@@ -7,7 +7,7 @@ struct SNR_MAX <: Combiner end
 struct EGC <: CorPol end
 
 struct MRC_PSD <: CorPol 
-    fs:Int
+    fs::Int
 end
 
 MRC_PSD(fs=10) = MRC_PSD(fs)
