@@ -16,7 +16,7 @@ function get_weights(x::AbstractMatrix, ref::Int, comb::PCC)
     return cor(x, view(x, :, ref)) |> vec
 end
 
-function get_weights(x::AbstractMatrix, ref::int, comb::PCC2)
+function get_weights(x::AbstractMatrix, ref::Int, comb::PCC2)
     pows = sum(abs2, x, dims=1) .|> sqrt
     cors = @views sum(x .* x[:, ref], dims=1)
     w = cors ./ (pows .* pows[ref]) |> vec
