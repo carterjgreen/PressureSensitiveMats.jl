@@ -4,8 +4,13 @@ abstract type CorPol <: Combiner end
 struct PCC <: Combiner end
 struct PCC2 <: Combiner end
 struct SNR_MAX <: Combiner end
-struct MRC_PSD <: CorPol end
 struct EGC <: CorPol end
+
+struct MRC_PSD <: CorPol 
+    fs:Int
+end
+
+MRC(fs=10) = MRC_PSD(fs)
 
 """
     get_weights(x, ref, comb)
@@ -31,10 +36,10 @@ end
 
 get_weights(x::AbstractMatrix, comb::Combiner) = get_weights(x, choose_ref(x), comb)
 
-function get_weights(x::AbstractMatrix{T}, comb::MRC_PSD; fs=10) where T
+function get_weights(x::AbstractMatrix{T}, comb::MRC_PSD) where T
     w = Vector{T}(undef, size(x, 2))
     for (i, s) in enumerate(eachcol(x))
-        w[i] = estimate_snr(s, fs=fs)
+        w[i] = estimate_snr(s, fs=comb.fs)
     end
     return w
 end
