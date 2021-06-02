@@ -4,11 +4,12 @@ using Distances, DSP, FFTW, InvertedIndices, Peaks, StatsBase, Statistics
 
 export est_br, est_br_fft, est_br_fft2
 export PCC, PCC2, SNR_MAX, EGC, MRC_PSD, get_weights, combiner
-export move_detect
+export Holtz, Solei, move_detect
 export active_sensors,
        apply2seg,
        choose_ref,
        estimate_snr,
+       extract_ref,
        mat_shape, 
        moving_stats,
        polarity_flip,

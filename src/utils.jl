@@ -1,10 +1,10 @@
 # Utility functions
 
-ord = (
+ord = [
     21, 9, 22, 10, 23, 11, 24, 12, 
     17, 5, 18, 6, 19, 7, 20, 8, 
     13, 1, 14, 2, 15, 3, 16, 4
-    )
+    ]
 
 function estimate_snr(x::AbstractVector; fs=10)
     # Estimate SNR for a 30-102.4s segment
