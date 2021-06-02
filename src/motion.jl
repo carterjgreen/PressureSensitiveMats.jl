@@ -3,9 +3,11 @@ struct Solei end
 
 function interval_merging(onset::BitVector, offset::BitVector)
     out = falses(length(onset))
-    for i in findall(onset)
-        ind = findnext(offset, i)
-        out[i:ind] .= true
+    if any(onset)
+        for i in findall(onset)
+            ind = findnext(offset, i)
+            out[i:ind] .= true
+        end
     end
     return out
 end
