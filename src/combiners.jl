@@ -34,7 +34,7 @@ get_weights(x::AbstractMatrix, comb::Combiner) = get_weights(x, choose_ref(x), c
 function get_weights(x::AbstractMatrix{T}, comb::MRC_PSD; fs=10) where T
     w = Vector{T}(undef, size(x, 2))
     for (i, s) in enumerate(eachcol(x))
-        w[i] = estimate_snr(s, fs)
+        w[i] = estimate_snr(s, fs=fs)
     end
     return w
 end
