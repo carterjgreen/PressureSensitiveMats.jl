@@ -66,15 +66,12 @@ function move_detect(x::AbstractMatrix; L=300, κ=3, min_samples=3)
     return vec(sum(out, dims=2)) .>= 2
 end
 
-function move_detect(x::AbstractVector, ::Solei; α=-0.029, κ=3, min_samples=2, height=183, weight=93)
+function move_detect(x::AbstractVector, ::Solei; α=-0.029, κ=3, min_samples=2, height=50, weight=50)
     # Movement detection from Soleimani, 2017
     # Expects reference sensor that is band-pass filtered
     # Set height and weight to 50 to ignore the last threshold
     onset = falses(length(x))
     offset = falses(length(x))
-    if mean(occupancy_detection(x)) < 0.75
-        return onset
-    end
 
     windows = window_sizes(x)
     ρ = 3 * (weight + height - 100)
