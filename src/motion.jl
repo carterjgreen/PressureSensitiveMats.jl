@@ -6,7 +6,9 @@ function interval_merging(onset::BitVector, offset::BitVector)
     if any(onset)
         for i in findall(onset)
             ind = findnext(offset, i)
-            out[i:ind] .= true
+            if isnothing(ind)
+                out[i:ind] .= true
+            end
         end
     end
     return out
@@ -103,4 +105,4 @@ function move_detect(x::AbstractVector, ::Solei; α=-0.029, κ=3, min_samples=2,
     return indicator .& (moving_var .> ρ)
 end
 
-move_detect(x, kwargs...) = move_detect(x, Holtz(), kwargs...)
+move_detect(x; kwargs...) = move_detect(x, Holtz(); kwargs...)

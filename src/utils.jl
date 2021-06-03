@@ -37,7 +37,7 @@ function moving_stats(x::AbstractVector{T}, w::AbstractVector{Int}) where T
     return moving_avg, moving_var
 end
 
-function apply2seg(x::AbstractMatrix{T}, f::Function, n::Integer) where T
+function apply2seg(f::Function, x::AbstractMatrix{T} , n::Integer) where T
     # Assumes a mat comes in and a vec goes out
     # Not much better than a mapreduce but it includes last segment
     ra = 1:n:size(x, 1)-n
