@@ -28,15 +28,19 @@ end
 
 function move_detect(x::AbstractVector, ::Holtz; L=300, κ=3, min_samples=3)
     # Movement detection from Holtzman, 2006
+    onset = falses(length(x))
+    offset = falses(length(x))
+    # Handle empty beds
+    if mean(occupancy) < 0.75
+        return onset
+    end
+
     moving_avg, moving_var = moving_stats(x, L)
     mvar_diff = diff(moving_var) # diff([0; mvar]) optionally
     control = κ .* sqrt.(moving_var)
     
     ucl = moving_avg .+ control
     lcl = moving_avg .- control
-    
-    onset = falses(length(x))
-    offset = falses(length(x))
 
     @views for i in 300:length(x)-(min_samples+1)
         val = x[i:i+min_samples-1]

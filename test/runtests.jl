@@ -1,6 +1,7 @@
+using Base: Number
 using PressureSensitiveMats
 using Test
 
 @testset "PressureSensitiveMats.jl" begin
-    # Write your tests here.
+    @test sfm(zeros(512)) isa Number
 end
