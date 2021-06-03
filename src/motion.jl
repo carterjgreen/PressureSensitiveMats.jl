@@ -6,7 +6,7 @@ function interval_merging(onset::BitVector, offset::BitVector)
     if any(onset)
         for i in findall(onset)
             ind = findnext(offset, i)
-            if isnothing(ind)
+            if !isnothing(ind)
                 out[i:ind] .= true
             end
         end
