@@ -10,7 +10,7 @@ function min_occupancy(x, m=300)
             b_new[end] += b[i]
         end
     end
-    return inverse_rle(a_new, b_new)
+    return BitVector(inverse_rle(a_new, b_new))
 end
 
 function breath_availability(x::AbstractArray{T, 3}) where T
@@ -25,6 +25,12 @@ function breath_availability(x::AbstractArray{T, 3}) where T
         end
     end
     return mode(out), out
+end
+
+function occupancy_detection(x::AbstractVector; β=312, m=300, n=1)
+    τ = cityblock(extrema(x)...) / n # Sareh uses n=4 in her code
+    occupancy = (x .> (β + τ))
+    return min_occupancy(occupancy, m)
 end
 
 function occupancy_detection(x::AbstractMatrix, max_dist=false; β=22555, m=300, n=1)
