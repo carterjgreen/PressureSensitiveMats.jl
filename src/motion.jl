@@ -13,7 +13,7 @@ function interval_merging(onset::BitVector, offset::BitVector)
 end
 
 function window_sizes(x::AbstractVector, w_max=300, thresh=100)
-    windows = fill!(Vector{Int}(undef, length(x)), w_max)
+    windows = fill(w_max, length(x))
     inds = argmaxima(x, 20)
     filter!(i -> x[i] > thresh, inds)
     diffs = diff(inds)
@@ -28,15 +28,16 @@ end
 
 function move_detect(x::AbstractVector, ::Holtz; L=300, κ=3, min_samples=3)
     # Movement detection from Holtzman, 2006
+    onset = falses(length(x))
+    offset = falses(length(x))
+    # Handle empty beds
+
     moving_avg, moving_var = moving_stats(x, L)
     mvar_diff = diff(moving_var) # diff([0; mvar]) optionally
     control = κ .* sqrt.(moving_var)
     
     ucl = moving_avg .+ control
     lcl = moving_avg .- control
-    
-    onset = falses(length(x))
-    offset = falses(length(x))
 
     @views for i in 300:length(x)-(min_samples+1)
         val = x[i:i+min_samples-1]
@@ -56,17 +57,25 @@ end
 
 function move_detect(x::AbstractMatrix; L=300, κ=3, min_samples=3)
     out = falses(size(x))
-    for (i, col) in enumerate(eachcol(x))
-    # Apply detection on each column/sensor
-        out[:, i] = move_detect(col, Holtz(), L=L, κ=κ, min_samples=min_samples)
+    if mean(occupancy_detection(x)) > 0.75
+        for (i, col) in enumerate(eachcol(x))
+        # Apply detection on each column/sensor
+            out[:, i] = move_detect(col, Holtz(), L=L, κ=κ, min_samples=min_samples)
+        end
     end
-    
     return vec(sum(out, dims=2)) .>= 2
 end
 
 function move_detect(x::AbstractVector, ::Solei; α=-0.029, κ=3, min_samples=2, height=183, weight=93)
     # Movement detection from Soleimani, 2017
     # Expects reference sensor that is band-pass filtered
+    # Set height and weight to 50 to ignore the last threshold
+    onset = falses(length(x))
+    offset = falses(length(x))
+    if mean(occupancy_detection(x)) < 0.75
+        return onset
+    end
+
     windows = window_sizes(x)
     ρ = 3 * (weight + height - 100)
     moving_avg, moving_var = moving_stats(x, windows)
@@ -75,9 +84,6 @@ function move_detect(x::AbstractVector, ::Solei; α=-0.029, κ=3, min_samples=2,
     ucl = moving_avg .+ control
     ucl_diff = diff([0; ucl])
     lcl = moving_avg .- control
-    
-    onset = falses(length(x))
-    offset = falses(length(x))
 
     @views for i in 300:length(x)-(min_samples+1)
         val = x[i:i+min_samples-1]
