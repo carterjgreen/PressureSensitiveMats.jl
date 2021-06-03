@@ -13,7 +13,7 @@ function interval_merging(onset::BitVector, offset::BitVector)
 end
 
 function window_sizes(x::AbstractVector, w_max=300, thresh=100)
-    windows = fill!(Vector{Int}(undef, length(x)), w_max)
+    windows = fill(w_max, length(x))
     inds = argmaxima(x, 20)
     filter!(i -> x[i] > thresh, inds)
     diffs = diff(inds)
