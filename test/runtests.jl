@@ -19,14 +19,30 @@ end
 @testset "Occupancy Detection" begin
     multi = fill(313.0, (35000, 72)) .+ randn((35000, 72))
 
-    @test occupancy_detection(multi) == zeros(35000)
+    multi_occ = occupancy_detection(multi)
+    multi_occ_dist = occupancy_detection(multi, true)
+    
+    @test multi_occ isa BitVector
+    @test multi_occ == zeros(35000)
+
+    @test multi_occ_dist isa BitVector
+    @test multi_occ_dist == zeros(35000)
 end
 
 @testset "Motion Detection" begin
     single = fill(313.0, 35000) .+ randn(35000)
     multi = fill(313.0, (35000, 72)) .+ randn((35000, 72))
 
-    @test move_detect(single, min_samples=10) == zeros(35000)
-    @test move_detect(multi, min_samples=10) == zeros(35000)
-    @test move_detect(single, Solei(), min_samples=10) == zeros(35000)
+    md_s = move_detect(single, min_samples=10)
+    md_m = move_detect(multi, min_samples=10)
+    md_solei = move_detect(single, Solei(), min_samples=10)
+
+    @test md_s isa BitVector
+    @test md_s == zeros(35000)
+
+    @test  md_m isa BitVector
+    @test md_m == zeros(35000)
+
+    @test md_solei isa BitVector
+    @test md_solei == zeros(35000)
 end
