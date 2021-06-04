@@ -3,7 +3,7 @@ function min_occupancy(x, m=300)
     a, b = rle(x)
     a_new, b_new = Bool[], Int[]
     for i in eachindex(b)
-        if b[i] > m
+        if b[i] > m || isempty(b_new)
             push!(a_new, a[i])
             push!(b_new, b[i])
         else
@@ -30,7 +30,7 @@ end
 function occupancy_detection(x::AbstractVector; β=312, m=300, n=4)
     τ = cityblock(extrema(x)...) / n # Sareh uses n=4 in her code
     occupancy = (x .> (β + τ))
-    return min_occupancy(occupancy, m)
+    return any(occupancy) ? min_occupancy(occupancy, m) : occupancy
 end
 
 function occupancy_detection(x::AbstractMatrix; max_dist=false, β=22555, m=300, n=4)
@@ -43,5 +43,5 @@ function occupancy_detection(x::AbstractMatrix; max_dist=false, β=22555, m=300,
     else
         occupancy = (Z .> (β + τ))
     end
-    return min_occupancy(occupancy, m)
+    return any(occupancy) ? min_occupancy(occupancy, m) : occupancy
 end
