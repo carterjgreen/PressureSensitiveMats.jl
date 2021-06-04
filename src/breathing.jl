@@ -1,7 +1,7 @@
 function est_br(x::AbstractVector, fs=10)
     # Returns breathing rate in bpm
     bounds = Int.((1.2 * fs, 30 * fs))
-    s = autocor(x, bounds[1]:bounds[2])
+    s = autocor(x, bounds[1]:bounds[2]-1)
     delay = argmax(s) + bounds[1]
     return 60 * fs / delay
 end
