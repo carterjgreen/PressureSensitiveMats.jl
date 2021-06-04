@@ -20,8 +20,8 @@ end
     multi = fill(313.0, (35000, 72)) .+ randn((35000, 72))
 
     multi_occ = occupancy_detection(multi)
-    multi_occ_dist = occupancy_detection(multi, true)
-    
+    multi_occ_dist = occupancy_detection(multi, max_dist=true)
+
     @test multi_occ isa BitVector
     @test multi_occ == zeros(35000)
 
@@ -35,7 +35,7 @@ end
 
     md_s = move_detect(single, min_samples=10)
     md_m = move_detect(multi, min_samples=10)
-    md_solei = move_detect(single, Solei(), min_samples=10)
+    md_solei = move_detect(Solei(), single, min_samples=10)
 
     @test md_s isa BitVector
     @test md_s == zeros(35000)

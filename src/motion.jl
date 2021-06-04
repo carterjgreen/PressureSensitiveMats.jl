@@ -28,7 +28,7 @@ function window_sizes(x::AbstractVector, w_max=300, thresh=100)
     return windows
 end
 
-function move_detect(x::AbstractVector, ::Holtz; L=300, κ=3, min_samples=3)
+function move_detect(::Holtz, x::AbstractVector; L=300, κ=3, min_samples=3)
     # Movement detection from Holtzman, 2006
     onset = falses(length(x))
     offset = falses(length(x))
@@ -62,13 +62,13 @@ function move_detect(x::AbstractMatrix; L=300, κ=3, min_samples=3)
     if mean(occupancy_detection(x)) > 0.75
         for (i, col) in enumerate(eachcol(x))
         # Apply detection on each column/sensor
-            out[:, i] = move_detect(col, Holtz(), L=L, κ=κ, min_samples=min_samples)
+            out[:, i] = move_detect(Holtz(), col, L=L, κ=κ, min_samples=min_samples)
         end
     end
     return vec(sum(out, dims=2)) .>= 2
 end
 
-function move_detect(x::AbstractVector, ::Solei; α=-0.029, κ=3, min_samples=2, height=50, weight=50)
+function move_detect(::Solei, x::AbstractVector; α=-0.029, κ=3, min_samples=2, height=50, weight=50)
     # Movement detection from Soleimani, 2017
     # Expects reference sensor that is band-pass filtered
     # Set height and weight to 50 to ignore the last threshold
@@ -105,4 +105,4 @@ function move_detect(x::AbstractVector, ::Solei; α=-0.029, κ=3, min_samples=2,
     return indicator .& (moving_var .> ρ)
 end
 
-move_detect(x; kwargs...) = move_detect(x, Holtz(); kwargs...)
+move_detect(x; kwargs...) = move_detect(Holtz(), x; kwargs...)

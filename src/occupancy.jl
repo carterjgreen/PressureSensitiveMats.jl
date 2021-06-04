@@ -33,7 +33,7 @@ function occupancy_detection(x::AbstractVector; β=312, m=300, n=1)
     return min_occupancy(occupancy, m)
 end
 
-function occupancy_detection(x::AbstractMatrix, max_dist=false; β=22555, m=300, n=1)
+function occupancy_detection(x::AbstractMatrix; max_dist=false, β=22555, m=300, n=1)
     Z = sum(x, dims=2) |> vec
     τ = cityblock(extrema(Z)...) / n # Sareh uses n=4 in her code
     
