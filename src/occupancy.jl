@@ -27,13 +27,13 @@ function breath_availability(x::AbstractArray{T, 3}) where T
     return mode(out), out
 end
 
-function occupancy_detection(x::AbstractVector; β=312, m=300, n=1)
+function occupancy_detection(x::AbstractVector; β=312, m=300, n=4)
     τ = cityblock(extrema(x)...) / n # Sareh uses n=4 in her code
     occupancy = (x .> (β + τ))
     return min_occupancy(occupancy, m)
 end
 
-function occupancy_detection(x::AbstractMatrix; max_dist=false, β=22555, m=300, n=1)
+function occupancy_detection(x::AbstractMatrix; max_dist=false, β=22555, m=300, n=4)
     Z = sum(x, dims=2) |> vec
     τ = cityblock(extrema(Z)...) / n # Sareh uses n=4 in her code
     
