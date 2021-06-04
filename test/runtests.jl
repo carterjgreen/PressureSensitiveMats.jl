@@ -9,11 +9,11 @@ end
 @testset "Combiners" begin
     multi = fill(313.0, (35000, 72)) .+ randn((35000, 72))
 
-    @test combiner(multi, SNR_MAX()) isa AbstractVector
-    @test combiner(multi, PCC()) isa AbstractVector
-    @test combiner(multi, PCC2()) isa AbstractVector
-    @test combiner(multi, EGC()) isa AbstractVector
-    @test apply2seg(s -> combiner(s, MRC_PSD(10)), multi, 300) isa AbstractVector
+    @test combiner(SNR_MAX(), multi) isa AbstractVector
+    @test combiner(PCC(), multi) isa AbstractVector
+    @test combiner(PCC2(), multi) isa AbstractVector
+    @test combiner(EGC(), multi) isa AbstractVector
+    @test apply2seg(s -> combiner(MRC_PSD(10), s), multi, 300) isa AbstractVector
 end
 
 @testset "Occupancy Detection" begin

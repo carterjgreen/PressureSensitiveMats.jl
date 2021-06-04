@@ -17,26 +17,26 @@ MRC_PSD(fs=10) = MRC_PSD(fs)
 
 Returns the weights for a section of the PSM by the method comb
 """
-function get_weights(x::AbstractMatrix, ref::Int, comb::PCC)
+function get_weights(comb::PCC, x::AbstractMatrix, ref::Int)
     return cor(x, view(x, :, ref)) |> vec
 end
 
-function get_weights(x::AbstractMatrix, ref::Int, comb::PCC2)
+function get_weights(comb::PCC2, x::AbstractMatrix, ref::Int)
     pows = sum(abs2, x, dims=1) .|> sqrt
     cors = @views sum(x .* x[:, ref], dims=1)
     w = cors ./ (pows .* pows[ref]) |> vec
     return w
 end
 
-function get_weights(x::AbstractMatrix, ref::Int, comb::SNR_MAX)
+function get_weights(comb::SNR_MAX, x::AbstractMatrix, ref::Int)
     cors = @views sum(x .* x[:, ref], dims=1)
     w = cors ./ cors[ref] |> vec
     return w
 end
 
-get_weights(x::AbstractMatrix, comb::Combiner) = get_weights(x, choose_ref(x), comb)
+get_weights(comb::Combiner, x::AbstractMatrix) = get_weights(comb, x, choose_ref(x))
 
-function get_weights(x::AbstractMatrix{T}, comb::MRC_PSD) where T
+function get_weights(comb::MRC_PSD, x::AbstractMatrix{T}) where T
     w = Vector{T}(undef, size(x, 2))
     for (i, s) in enumerate(eachcol(x))
         w[i] = estimate_snr(s, fs=comb.fs)
@@ -44,23 +44,21 @@ function get_weights(x::AbstractMatrix{T}, comb::MRC_PSD) where T
     return w
 end
 
-function get_weights(x::AbstractMatrix{T}, comb::EGC) where T
-    return ones(T, size(x, 2))
-end
-
 """
     combiner(x, comb)
 
 Gets weights from comb and applies them to x
 """
-function combiner(x::AbstractMatrix, comb::Combiner)
-    w = get_weights(x, comb)
+function combiner(comb::Combiner, x::AbstractMatrix)
+    w = get_weights(comb, x)
     return x * w
 end
 
-function combiner(x::AbstractMatrix, comb::CorPol)
-    w = get_weights(x, comb)
+function combiner(comb::CorPol, x::AbstractMatrix)
+    w = get_weights(comb, x)
     return polarity_flip(x) * w
 end
 
-combiner(x::AbstractMatrix) = combiner(x, SNR_MAX())
+combiner(comb::EGC, x::AbstractMatrix) = sum(polarity_flip(x), dims=2) |> vec
+
+combiner(x::AbstractMatrix) = combiner(SNR_MAX(), x)
