@@ -10,7 +10,7 @@ function estimate_snr(x::AbstractVector; fs=10)
     # Estimate SNR for a 30-102.4s segment
     pow = power(periodogram(x, nfft=1024, window=hanning))
     ps = argmax(pow)
-    n = mean(pow[Not(ps)]) * 0.73
+    n = mean(pow[Not(ps, 2ps)]) * 0.73
     w = (pow[ps] * fs / 1024 - n) / n
     return w
 end

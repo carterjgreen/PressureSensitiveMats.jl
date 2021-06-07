@@ -2,7 +2,19 @@ using Base: Number
 using PressureSensitiveMats
 using Test
 
-@testset "PressureSensitiveMats.jl" begin
+@testset "Utils" begin
+    ma1, mv1 = moving_stats(ones(5000), 3)
+    ma2, mv2 = moving_stats(ones(5000), fill(3, 5000))
+
+    @test ma1[3:end] ≈ ones(4998)
+    @test mv1[5:end] ≈ zeros(4996)
+
+    @test ma2 ≈ ones(5000)
+    @test mv2 ≈ zeros(5000)
+
+    @test mat_shape(ones(72)) isa AbstractVector
+    @test mat_shape(ones(5000, 72)) isa AbstractMatrix
+
     @test sfm(zeros(512)) isa Number
 end
 
