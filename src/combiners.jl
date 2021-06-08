@@ -13,7 +13,7 @@ end
 MRC_PSD() = MRC_PSD(10)
 
 """
-    get_weights(x, ref, comb)
+    get_weights(comb, x, ref)
 
 Returns the weights for a section of the PSM by the method comb
 """
@@ -45,7 +45,7 @@ function get_weights(comb::MRC_PSD, x::AbstractMatrix{T}) where T
 end
 
 """
-    combiner(x, comb)
+    combiner(comb, x)
 
 Gets weights from comb and applies them to x
 """
