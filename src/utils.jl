@@ -73,3 +73,10 @@ function sfm(x)
     s = abs2.(fft(x))
     return geomean(s) / mean(s)
 end
+
+function active_sfm(x::AbstractMatrix, n, thresh=-50)
+    fo(sig) = mapreduce(i -> sfm(sig[i:i+n-1]), vcat, 1:n:size(x, 1)-n)
+    s = mapreduce(fo, hcat, eachcol(x))
+    actives = pow2db.(s) .> thresh
+    return vec(mean(actives, dims=1) .> 0.4)
+end

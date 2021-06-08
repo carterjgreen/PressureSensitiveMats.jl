@@ -16,6 +16,7 @@ using Test
     @test mat_shape(ones(5000, 72)) isa AbstractMatrix
 
     @test sfm(zeros(512)) isa Number
+    @test active_sfm(randn(35000, 72), 300) isa AbstractVector
 end
 
 @testset "Combiners" begin

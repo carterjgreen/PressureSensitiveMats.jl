@@ -7,6 +7,7 @@ export PCC, PCC2, SNR_MAX, EGC, MRC_PSD, get_weights, combiner
 export Holtz, Solei, move_detect
 export breath_availability, occupancy_detection
 export active_sensors,
+       active_sfm,
        apply2seg,
        choose_ref,
        estimate_snr,
@@ -15,6 +16,7 @@ export active_sensors,
        moving_stats,
        polarity_flip,
        sfm
+
        
 include("breathing.jl")
 include("combiners.jl")
