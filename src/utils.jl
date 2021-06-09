@@ -50,11 +50,11 @@ function apply2seg(f::Function, x::AbstractMatrix{T} , n::Integer) where T
 end
 
 function mat_shape(x::AbstractVector, n=3)
-    return view(x, mapreduce(i -> ord .* i, vcat, 1:n))
+    return view(x, mapreduce(i -> ord .+ (24 * i), vcat, 0:n-1))
 end
 
 function mat_shape(x::AbstractMatrix, n=3)
-    return view(x, :, mapreduce(i -> ord .* i, vcat, 1:n))
+    return view(x, :, mapreduce(i -> ord .+ (24 * i), vcat, 0:n-1))
 end
 
 active_sensors(x::AbstractMatrix, thresh=0.4*2046) = vec(mean(x, dims=1) .> thresh)

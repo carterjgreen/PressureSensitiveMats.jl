@@ -41,7 +41,7 @@ function get_weights(comb::MRC_PSD, x::AbstractMatrix{T}) where T
     for (i, s) in enumerate(eachcol(x))
         w[i] = estimate_snr(s, fs=comb.fs)
     end
-    return w / maximum(w)
+    return w
 end
 
 """
