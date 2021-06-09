@@ -66,7 +66,6 @@ ex. Nx72 -> 9x8xN
 ex. Nx24 -> 3x8xN
 """
 function reshape_psm(x::AbstractMatrix, n=div(size(x, 2), 24))
-	println(n)
 	new_shape = reshape(mat_shape(x, n)', 3, 8, n, :) 
 	return reduce(vcat, eachslice(new_shape, dims=3))
 end
