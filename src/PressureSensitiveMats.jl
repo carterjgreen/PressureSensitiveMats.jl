@@ -15,6 +15,7 @@ export active_sensors,
        mat_shape, 
        moving_stats,
        polarity_flip,
+       reshape_psm,
        sfm
 
        

@@ -38,7 +38,7 @@ function occupancy_detection(x::AbstractMatrix; max_dist=false, β=25000, m=300,
     τ = cityblock(extrema(Z)...) / n # Sareh uses n=4 in her code
     
     if max_dist # Sareh's post-processing
-        k, breath = breath_availability(reshape(mat_shape(x)', 9, 8, :))
+        k, breath = breath_availability(reshape_psm(x))
         occupancy = (Z .> (β + τ)) .& (0.85*k .< breath .< 1.15*k)
     else
         occupancy = (Z .> (β + τ))

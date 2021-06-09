@@ -57,6 +57,20 @@ function mat_shape(x::AbstractMatrix, n=3)
     return view(x, :, mapreduce(i -> ord .+ (24 * i), vcat, 0:n-1))
 end
 
+"""
+	reshape_psm(psm, n_mats)
+Takes in a PSM and reshapes it to be in the correct order.
+
+ex. Nx72 -> 9x8xN 
+
+ex. Nx24 -> 3x8xN
+"""
+function reshape_psm(x::AbstractMatrix, n=div(size(x, 2), 24))
+	println(n)
+	new_shape = reshape(mat_shape(x, n)', 3, 8, n, :) 
+	return reduce(vcat, eachslice(new_shape, dims=3))
+end
+
 active_sensors(x::AbstractMatrix, thresh=0.4*2046) = vec(mean(x, dims=1) .> thresh)
 
 function choose_ref(x::AbstractMatrix)
