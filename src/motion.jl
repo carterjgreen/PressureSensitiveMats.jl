@@ -51,7 +51,7 @@ function move_detect(::Holtz, x::AbstractVector; L=300, κ=3, min_samples=3)
     # Flag offsets
     for i in findall(onset) # location of trues
         ind = findfirst(x -> x < 0.1, @view mvar_diff[i:end])
-        offset[i + ind] = true
+        !isnothing(ind) ? offset[i + ind] = true : nothing
     end
     
     return interval_merging(onset, offset)
