@@ -47,7 +47,7 @@ end
 """
     combiner(comb, x)
 
-Gets weights from comb and applies them to x
+Gets weights from combining method comb and applies them to x
 """
 function combiner(comb::Combiner, x::AbstractMatrix)
     w = get_weights(comb, x)
@@ -62,3 +62,38 @@ end
 combiner(comb::EGC, x::AbstractMatrix) = sum(polarity_flip(x), dims=2) |> vec
 
 combiner(x::AbstractMatrix) = combiner(SNR_MAX(), x)
+
+"""
+    snrmax(x)
+
+Perform SNR-MAX combining on x
+"""
+snrmax(x::AbstractMatrix) = combiner(SNR_MAX(), x)
+
+"""
+    mrc(x)
+
+Perform MRC-PSD combining on x. Currently x must be less than 512 samples
+"""
+mrc(x::AbstractMatrix, fs) = combiner(MRC_PSD(fs), x)
+
+"""
+    egc(x)
+
+Perform equal gain combining on x
+"""
+egc(x::AbstractMatrix) = combiner(EGC(), x)
+
+"""
+    pcc(x)
+
+Perform Pearson Correlation Coefficient combining on x
+"""
+pcc(x::AbstractMatrix) = combiner(PCC2(), x)
+
+"""
+    selection(x)
+
+Perform selection combining on x
+"""
+selection(x::AbstractMatrix) = extract_ref(x)
