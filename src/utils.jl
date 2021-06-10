@@ -19,6 +19,11 @@ function estimate_snr(x::AbstractVector; fs=10)
     return w
 end
 
+"""
+    moving_stats(x::AbstractVector, L::Int)
+
+Return moving average and variance of x using a window length L
+"""
 function moving_stats(x::AbstractVector{T}, L::Int) where T
     # Use filters to calculate running mean and var
     avg_filt = ones(T, L) ./ L
@@ -30,6 +35,11 @@ function moving_stats(x::AbstractVector{T}, L::Int) where T
     return moving_avg, moving_var
 end
 
+"""
+    moving_stats(x::AbstractVector, w::AbstractVector{Int})
+
+Return moving average and variance of x using a window lengths w
+"""
 function moving_stats(x::AbstractVector{T}, w::AbstractVector{Int}) where T
     moving_avg = zeros(T, length(x))
     moving_var = zeros(T, length(x))
@@ -41,6 +51,11 @@ function moving_stats(x::AbstractVector{T}, w::AbstractVector{Int}) where T
     return moving_avg, moving_var
 end
 
+"""
+    apply2seg(f::Function, x::AbstractMatrix{T} , n::Integer)
+
+Convenience function to apply a function f to segments of length n to the matrix x.
+"""
 function apply2seg(f::Function, x::AbstractMatrix{T} , n::Integer) where T
     # Assumes a mat comes in and a vec goes out
     # Not much better than a mapreduce but it includes last segment
@@ -53,6 +68,11 @@ function apply2seg(f::Function, x::AbstractMatrix{T} , n::Integer) where T
     return out
 end
 
+"""
+    mat_shape(x, n)
+
+Reorders the columns of a matrix to be in the proper sensor order.
+"""
 function mat_shape(x::AbstractVector, n=3)
     return view(x, mapreduce(i -> ord .+ (24 * i), vcat, 0:n-1))
 end
@@ -74,8 +94,18 @@ function reshape_psm(x::AbstractMatrix, n=div(size(x, 2), 24))
 	return reduce(vcat, eachslice(new_shape, dims=3))
 end
 
+"""
+    active_sensors(x, thresh)
+
+    Return the indices of sensors whose mean value is greater than thresh.
+"""
 active_sensors(x::AbstractMatrix, thresh=0.4*2046) = vec(mean(x, dims=1) .> thresh)
 
+"""
+    choose_ref(x)
+
+Return the index of the sensor with the greatest power.
+"""
 function choose_ref(x::AbstractMatrix)
     # Choose 
     out = sum(abs2, x, dims=1) |> argmax
@@ -84,13 +114,28 @@ end
 
 extract_ref(x::AbstractMatrix) = x[:, choose_ref(x)]
 
+"""
+    polarity_flip(x)
+
+Flips the polarity of sensors based on their PCC with the reference sensor.
+"""
 polarity_flip(x) = sign.(cor(x, @view x[:, choose_ref(x)]))' .* x
 
+"""
+    sfm(x)
+Returns the spectral flatness measure of a signal.
+"""
 function sfm(x)
     s = abs2.(fft(x))
     return geomean(s) / mean(s)
 end
 
+"""
+    active_sfm(x, n, thresh)
+
+Return the indices of sensors with a mean spectral flatness measure, taken in segments of
+length n, above the threshold in dB.
+"""
 function active_sfm(x::AbstractMatrix, n, thresh=-50)
     fo(sig) = mapreduce(i -> sfm(sig[i:i+n-1]), vcat, 1:n:size(x, 1)-n)
     s = mapreduce(fo, hcat, eachcol(x))

@@ -8,7 +8,3 @@ Documentation for [PressureSensitiveMats](https://github.com/carterjgreen/Pressu
 
 ```@index
 ```
-
-```@autodocs
-Modules = [PressureSensitiveMats]
-```

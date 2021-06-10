@@ -1,6 +1,12 @@
 struct Holtz end
 struct Solei end
 
+"""
+    interval_merging(onset::BitVector, offset::BitVector)
+
+Given two BitVectors signalling offsets and onsets, this function merges the two 
+to create one indicator signal.
+"""
 function interval_merging(onset::BitVector, offset::BitVector)
     out = falses(length(onset))
     if any(onset)
@@ -14,6 +20,15 @@ function interval_merging(onset::BitVector, offset::BitVector)
     return out
 end
 
+"""
+    window_sizes(x::AbstractVector, w_max=300, thresh=100)
+
+Function to calculate window sizes based on location of peaks in a combined PSM signal.
+
+# Arguments:
+ - `w_max=300` : Maximum window size.
+ - `thresh=100` : Minimum peak magnitude threshold.
+"""
 function window_sizes(x::AbstractVector, w_max=300, thresh=100)
     windows = fill(w_max, length(x))
     inds = argmaxima(x, 20)
@@ -28,6 +43,18 @@ function window_sizes(x::AbstractVector, w_max=300, thresh=100)
     return windows
 end
 
+"""
+    move_detect(::Holtz, x::AbstractVector; kwargs...)
+
+Implements movement detection from Identifying Movement Onset Times for a Bed-Based 
+Pressure Sensor Array - 2006, Holtzman.
+
+# Arguments:
+ - `L` : Length of window for moving moving_stats.
+ - `κ` : Magnitude of the control signal.
+ - `min_samples` : The minimum number of samples that a movement is allowed to be.
+
+"""
 function move_detect(::Holtz, x::AbstractVector; L=300, κ=3, min_samples=3)
     # Movement detection from Holtzman, 2006
     onset = falses(length(x))
@@ -68,6 +95,21 @@ function move_detect(x::AbstractMatrix; L=300, κ=3, min_samples=3)
     return vec(sum(out, dims=2)) .>= 2
 end
 
+"""
+    move_detect(::Solei, x::AbstractVector; kwargs...)
+
+Implements movement detection from Movement Detection with Adaptive Window Length for 
+Unobtrusive Bed-based Pressure-Sensor Array - 2017, Soleimani
+
+# Arguments:
+ - `L` : Length of window for moving moving_stats.
+ - `α=-0.029` : Threshold of first differences for the offset
+ - `κ=3` : Magnitude of the control signal.
+ - `min_samples=2` : The minimum number of samples that a movement is allowed to be.
+ - `height=50` : Subject height in cm. Default to cancel out weight in ρ calculation.
+ - `weight=50` : Subject weight in kg. Default to cancel out height in ρ calculation.
+
+"""
 function move_detect(::Solei, x::AbstractVector; α=-0.029, κ=3, min_samples=2, height=50, weight=50)
     # Movement detection from Soleimani, 2017
     # Expects reference sensor that is band-pass filtered

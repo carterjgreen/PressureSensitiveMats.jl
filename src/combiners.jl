@@ -66,34 +66,37 @@ combiner(x::AbstractMatrix) = combiner(SNR_MAX(), x)
 """
     snrmax(x)
 
-Perform SNR-MAX combining on x
+Perform SNR-MAX combining on x. Equivalent to combiner(SNR_MAX(), x)
 """
 snrmax(x::AbstractMatrix) = combiner(SNR_MAX(), x)
 
 """
     mrc(x)
 
-Perform MRC-PSD combining on x. Currently x must be less than 512 samples
+Perform MRC-PSD combining on x. Currently x must be less than 512 samples.
+Equivalent to combiner(MRC_PSD(fs), x)
 """
 mrc(x::AbstractMatrix, fs) = combiner(MRC_PSD(fs), x)
 
 """
     egc(x)
 
-Perform equal gain combining on x
+Perform equal gain combining on x. Equivalent to combiner(EGC(), x)
 """
 egc(x::AbstractMatrix) = combiner(EGC(), x)
 
 """
     pcc(x)
 
-Perform Pearson Correlation Coefficient combining on x
+Perform Pearson Correlation Coefficient combining on x.
+Equivalent to combiner(PCC2(), x)
 """
 pcc(x::AbstractMatrix) = combiner(PCC2(), x)
 
 """
     selection(x)
 
-Perform selection combining on x
+Perform selection combining on x.
+Equivalent to extract_ref(x)
 """
 selection(x::AbstractMatrix) = extract_ref(x)
