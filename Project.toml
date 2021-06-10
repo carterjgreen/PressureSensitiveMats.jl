@@ -1,7 +1,7 @@
 name = "PressureSensitiveMats"
 uuid = "f7c67009-f2f2-4fe9-9b95-d54958a44a7b"
 authors = ["Carter Green <carter.green@icloud.com> and contributors"]
-version = "0.2.8"
+version = "0.3.0"
 
 [deps]
 DSP = "717857b8-e6f2-59f4-9121-6e50c889abd2"
