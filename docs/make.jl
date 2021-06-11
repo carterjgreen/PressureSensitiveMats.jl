@@ -24,4 +24,5 @@ makedocs(;
 
 deploydocs(;
     repo="github.com/carterjgreen/PressureSensitiveMats.jl",
+    devbranch = "main",
 )
