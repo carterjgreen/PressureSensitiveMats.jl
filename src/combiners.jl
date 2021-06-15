@@ -24,13 +24,13 @@ end
 function get_weights(comb::PCC2, x::AbstractMatrix, ref::Int)
     pows = sum(abs2, x, dims=1) .|> sqrt
     cors = @views sum(x .* x[:, ref], dims=1)
-    w = cors ./ (pows .* pows[ref]) |> vec
+    w = cors ./ (pows .* maximum(pows)) |> vec
     return w
 end
 
 function get_weights(comb::SNR_MAX, x::AbstractMatrix, ref::Int)
     cors = @views sum(x .* x[:, ref], dims=1)
-    w = cors ./ cors[ref] |> vec
+    w = cors ./ maximum(cors) |> vec
     return w
 end
 
