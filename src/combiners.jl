@@ -71,7 +71,7 @@ Perform SNR-MAX combining on x. Equivalent to combiner(SNR_MAX(), x)
 snrmax(x::AbstractMatrix) = combiner(SNR_MAX(), x)
 
 """
-    mrc(x)
+    mrc(x, fs)
 
 Perform MRC-PSD combining on x. Currently x must be less than 512 samples.
 Equivalent to combiner(MRC_PSD(fs), x)
