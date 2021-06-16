@@ -45,6 +45,15 @@ function get_weights(comb::MRC_PSD, x::AbstractMatrix{T}) where T
 end
 
 """
+    combiner(comb, x, ref)
+
+Gets weights from combining method comb with a chosen reference sensor and applies it to x.    
+"""
+function combiner(comb::Combiner, x::AbstractMatrix, ref)
+    w = get_weights(comb, x, ref)
+    return x * w
+end
+"""
     combiner(comb, x)
 
 Gets weights from combining method comb and applies them to x
