@@ -5,7 +5,7 @@ Given an indicator signal this function uses run-length encoding to enforce mini
 lengths. If an indicator segment is less than the minimum it is added to the length
 of the previous segment. 
 """
-function min_occupancy(x::AbstractVector, m=300)
+function min_occupancy(x::AbstractVector{<:Number}, m=300)
     # Use run-length encoding to find lengths and enforce minimum
     a, b = rle(x)
     a_new, b_new = Bool[], Int[]
