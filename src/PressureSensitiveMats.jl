@@ -1,6 +1,6 @@
 module PressureSensitiveMats
 
-using Distances, DSP, FFTW, InvertedIndices, Peaks, StatsBase, Statistics
+using Distances, DSP, FFTW, InvertedIndices, Peaks, SnoopPrecompile, StatsBase, Statistics
 
 export est_br, est_br_fft, est_br_fft2
 export PCC, PCC2, SNR_MAX, EGC, MRC_PSD, get_weights, combiner, egc, snrmax, mrc, pcc, selection
@@ -25,4 +25,5 @@ include("motion.jl")
 include("occupancy.jl")
 include("utils.jl")
 
+include("precompile.jl")
 end
