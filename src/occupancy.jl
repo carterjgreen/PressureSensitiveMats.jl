@@ -72,7 +72,7 @@ Pressure Sensor Arrays - 2018, Soleimani.
  - `m=300` : Minimum number of samples to be declared an occupancy.
  - `n=4` : Sensitivity parameter
 """
-function occupancy_detection(x::AbstractMatrix{<:Number}; max_dist::Bool=false, β::real=25000, m::Integer=300, n::Real=4)
+function occupancy_detection(x::AbstractMatrix{<:Number}; max_dist::Bool=false, β::Real=25000, m::Integer=300, n::Real=4)
     Z = sum(x, dims=2) |> vec
     τ = cityblock(extrema(Z)...) / n # Sareh uses n=4 in her code
     
