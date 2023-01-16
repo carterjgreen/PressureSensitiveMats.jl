@@ -7,7 +7,7 @@ struct SNR_MAX <: Combiner end
 struct EGC <: CorPol end
 
 struct MRC_PSD <: CorPol 
-    fs::Integer
+    fs::Real
 end
 
 MRC_PSD() = MRC_PSD(10)
@@ -17,18 +17,18 @@ MRC_PSD() = MRC_PSD(10)
 
 Returns the weights for a section of the PSM by the method comb
 """
-function get_weights(comb::PCC, x::AbstractMatrix, ref::Integer)
+function get_weights(comb::PCC, x::AbstractMatrix{<:Number}, ref::Integer)
     return cor(x, view(x, :, ref)) |> vec
 end
 
-function get_weights(comb::PCC2, x::AbstractMatrix, ref::Integer)
+function get_weights(comb::PCC2, x::AbstractMatrix{<:Number}, ref::Integer)
     pows = sum(abs2, x, dims=1) .|> sqrt
     cors = @views sum(x .* x[:, ref], dims=1)
     w = cors ./ (pows .* maximum(pows)) |> vec
     return w
 end
 
-function get_weights(comb::SNR_MAX, x::AbstractMatrix, ref::Integer)
+function get_weights(comb::SNR_MAX, x::AbstractMatrix{<:Number}, ref::Integer)
     cors = @views sum(x .* x[:, ref], dims=1)
     w = cors ./ maximum(cors) |> vec
     return w
@@ -49,7 +49,7 @@ end
 
 Gets weights from combining method comb with a chosen reference sensor and applies it to x.    
 """
-function combiner(comb::Combiner, x::AbstractMatrix{<:Number}, ref)
+function combiner(comb::Combiner, x::AbstractMatrix{<:Number}, ref::Integer)
     w = get_weights(comb, x, ref)
     return x * w
 end

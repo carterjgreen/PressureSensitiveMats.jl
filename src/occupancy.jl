@@ -5,7 +5,7 @@ Given an indicator signal this function uses run-length encoding to enforce mini
 lengths. If an indicator segment is less than the minimum it is added to the length
 of the previous segment. 
 """
-function min_occupancy(x::AbstractVector{<:Number}, m=300)
+function min_occupancy(x::AbstractVector{<:Number}, m::Integer=300)
     # Use run-length encoding to find lengths and enforce minimum
     a, b = rle(x)
     a_new, b_new = Bool[], Int[]
@@ -54,7 +54,7 @@ Unobtrusive Pressure Sensor Arrays - 2018, Soleimani.
  - `m=300` : Minimum number of samples to be declared an occupancy.
  - `n=4` : Sensitivity parameter
 """
-function occupancy_detection(x::AbstractVector{<:Number}; β=350, m=300, n=4)
+function occupancy_detection(x::AbstractVector{<:Number}; β::Real=350, m::Integer=300, n::Real=4)
     τ = cityblock(extrema(x)...) / n # Sareh uses n=4 in her code
     occupancy = (x .> (β + τ))
     return any(occupancy) ? min_occupancy(occupancy, m) : occupancy
@@ -72,7 +72,7 @@ Pressure Sensor Arrays - 2018, Soleimani.
  - `m=300` : Minimum number of samples to be declared an occupancy.
  - `n=4` : Sensitivity parameter
 """
-function occupancy_detection(x::AbstractMatrix{<:Number}; max_dist=false, β=25000, m=300, n=4)
+function occupancy_detection(x::AbstractMatrix{<:Number}; max_dist::Bool=false, β::real=25000, m::Integer=300, n::Real=4)
     Z = sum(x, dims=2) |> vec
     τ = cityblock(extrema(Z)...) / n # Sareh uses n=4 in her code
     

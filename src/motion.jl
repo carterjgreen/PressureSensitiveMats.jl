@@ -29,7 +29,7 @@ Function to calculate window sizes based on location of peaks in a combined PSM 
  - `w_max=300` : Maximum window size.
  - `thresh=100` : Minimum peak magnitude threshold.
 """
-function window_sizes(x::AbstractVector{<:Number}, w_max=300, thresh=100)
+function window_sizes(x::AbstractVector{<:Number}, w_max::Integer=300, thresh::Number=100)
     windows = fill(w_max, length(x))
     inds = argmaxima(x, 20)
     filter!(i -> x[i] > thresh, inds)
@@ -55,7 +55,7 @@ Pressure Sensor Array - 2006, Holtzman.
  - `min_samples` : The minimum number of samples that a movement is allowed to be.
 
 """
-function move_detect(::Holtz, x::AbstractVector{<:Number}; L=300, κ=3, min_samples=3)
+function move_detect(::Holtz, x::AbstractVector{<:Number}; L::Integer=300, κ::Real=3, min_samples::Integer=3)
     # Movement detection from Holtzman, 2006
     onset = falses(length(x))
     offset = falses(length(x))
@@ -84,7 +84,7 @@ function move_detect(::Holtz, x::AbstractVector{<:Number}; L=300, κ=3, min_samp
     return interval_merging(onset, offset)
 end
 
-function move_detect(x::AbstractMatrix{<:Number}; L=300, κ=3, min_samples=3)
+function move_detect(x::AbstractMatrix{<:Number}; L::Integer=300, κ::Real=3, min_samples::Integer=3)
     out = falses(size(x))
     if mean(occupancy_detection(x)) > 0.75
         for (i, col) in enumerate(eachcol(x))
@@ -110,7 +110,10 @@ Unobtrusive Bed-based Pressure-Sensor Array - 2017, Soleimani
  - `weight=50` : Subject weight in kg. Default to cancel out height in ρ calculation.
 
 """
-function move_detect(::Solei, x::AbstractVector{<:Number}; α=-0.029, κ=3, min_samples=2, height=50, weight=50)
+function move_detect(
+    ::Solei, 
+    x::AbstractVector{<:Number}; 
+    α::Real=-0.029, κ::Integer=3, min_samples::Integer=2, height::Real=50, weight::Real=50)
     # Movement detection from Soleimani, 2017
     # Expects reference sensor that is band-pass filtered
     # Set height and weight to 50 to ignore the last threshold

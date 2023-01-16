@@ -10,7 +10,7 @@ ord = [
 	24, 20, 16, 
 	12, 8, 4]
 
-function estimate_snr(x::AbstractVector{<:Number}; fs=10)
+function estimate_snr(x::AbstractVector{<:Number}; fs::Real=10)
     # Estimate SNR for a 30-102.4s segment
     pow = power(periodogram(x, nfft=1024, window=hanning))
     ps = argmax(pow)
@@ -73,11 +73,11 @@ end
 
 Reorders the columns of a matrix to be in the proper sensor order.
 """
-function mat_shape(x::AbstractVector{<:Number}, n=3)
+function mat_shape(x::AbstractVector{<:Number}, n::Integer=3)
     return view(x, mapreduce(i -> ord .+ (24 * i), vcat, 0:n-1))
 end
 
-function mat_shape(x::AbstractMatrix{<:Number}, n=3)
+function mat_shape(x::AbstractMatrix{<:Number}, n::Integer=3)
     return view(x, :, mapreduce(i -> ord .+ (24 * i), vcat, 0:n-1))
 end
 
@@ -89,7 +89,7 @@ ex. Nx72 -> 9x8xN
 
 ex. Nx24 -> 3x8xN
 """
-function reshape_psm(x::AbstractMatrix{<:Number}, n=div(size(x, 2), 24))
+function reshape_psm(x::AbstractMatrix{<:Number}, n::Integer=div(size(x, 2), 24))
 	new_shape = reshape(mat_shape(x, n)', 3, 8, n, :) 
 	return reduce(vcat, eachslice(new_shape, dims=3))
 end
@@ -99,7 +99,7 @@ end
 
     Return the indices of sensors whose mean value is greater than thresh.
 """
-active_sensors(x::AbstractMatrix{<:Number}, thresh=0.4*2046) = vec(mean(x, dims=1) .> thresh)
+active_sensors(x::AbstractMatrix{<:Number}, thresh::Real=0.4*2046) = vec(mean(x, dims=1) .> thresh)
 
 """
     choose_ref(x)
@@ -119,13 +119,13 @@ extract_ref(x::AbstractMatrix{<:Number}) = x[:, choose_ref(x)]
 
 Flips the polarity of sensors based on their PCC with the reference sensor.
 """
-polarity_flip(x) = sign.(cor(x, @view x[:, choose_ref(x)]))' .* x
+polarity_flip(x::AbstractVecOrMat{<:Number}) = sign.(cor(x, @view x[:, choose_ref(x)]))' .* x
 
 """
     sfm(x)
 Returns the spectral flatness measure of a signal.
 """
-function sfm(x)
+function sfm(x::AbstractArray{<:Number})
     s = abs2.(fft(x))
     return geomean(s) / mean(s)
 end
@@ -136,7 +136,7 @@ end
 Return the indices of sensors with a mean spectral flatness measure, taken in segments of
 length n, above the threshold in dB.
 """
-function active_sfm(x::AbstractMatrix{<:Number}, n, thresh=-50)
+function active_sfm(x::AbstractMatrix{<:Number}, n::Integer, thresh::Real=-50)
     fo(sig) = mapreduce(i -> sfm(sig[i:i+n-1]), vcat, 1:n:size(x, 1)-n)
     s = mapreduce(fo, hcat, eachcol(x))
     actives = pow2db.(s) .> thresh
