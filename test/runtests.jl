@@ -22,8 +22,8 @@ using Test
     @test ma2 ≈ ones(5000)
     @test mv2 ≈ zeros(5000)
 
-    @test mat_shape(ones(72)) isa AbstractVector
-    @test mat_shape(ones(5000, 72)) isa AbstractMatrix
+    @test mat_shape(ones(72)) isa AbstractVector{<:Number}
+    @test mat_shape(ones(5000, 72)) isa AbstractMatrix{<:Number}
 
     @test sfm(zeros(512)) isa Number
     @test active_sfm(randn(35000, 72), 300) isa AbstractVector
@@ -34,11 +34,11 @@ end
 @testset "Combiners" begin
     multi = fill(313.0, (35000, 72)) .+ randn((35000, 72))
 
-    @test combiner(SNR_MAX(), multi) isa AbstractVector
-    @test combiner(PCC(), multi) isa AbstractVector
-    @test combiner(PCC2(), multi) isa AbstractVector
-    @test combiner(EGC(), multi) isa AbstractVector
-    @test apply2seg(s -> combiner(MRC_PSD(10), s), multi, 300) isa AbstractVector
+    @test combiner(SNR_MAX(), multi) isa AbstractVector{<:Number}
+    @test combiner(PCC(), multi) isa AbstractVector{<:Number}
+    @test combiner(PCC2(), multi) isa AbstractVector{<:Number}
+    @test combiner(EGC(), multi) isa AbstractVector{<:Number}
+    @test apply2seg(s -> combiner(MRC_PSD(10), s), multi, 300) isa AbstractVector{<:Number}
 end
 
 @testset "Occupancy Detection" begin
