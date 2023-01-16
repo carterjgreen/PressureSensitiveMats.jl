@@ -6,7 +6,7 @@ struct PCC2 <: Combiner end
 struct SNR_MAX <: Combiner end
 struct EGC <: CorPol end
 
-struct MRC_PSD <: CorPol 
+struct MRC_PSD <: CorPol
     fs::Real
 end
 
@@ -22,24 +22,26 @@ function get_weights(comb::PCC, x::AbstractMatrix{<:Number}, ref::Integer)
 end
 
 function get_weights(comb::PCC2, x::AbstractMatrix{<:Number}, ref::Integer)
-    pows = sum(abs2, x, dims=1) .|> sqrt
-    cors = @views sum(x .* x[:, ref], dims=1)
+    pows = sum(abs2, x, dims = 1) .|> sqrt
+    cors = @views sum(x .* x[:, ref], dims = 1)
     w = cors ./ (pows .* maximum(pows)) |> vec
     return w
 end
 
 function get_weights(comb::SNR_MAX, x::AbstractMatrix{<:Number}, ref::Integer)
-    cors = @views sum(x .* x[:, ref], dims=1)
+    cors = @views sum(x .* x[:, ref], dims = 1)
     w = cors ./ maximum(cors) |> vec
     return w
 end
 
-get_weights(comb::Combiner, x::AbstractMatrix{<:Number}) = get_weights(comb, x, choose_ref(x))
+function get_weights(comb::Combiner, x::AbstractMatrix{<:Number})
+    get_weights(comb, x, choose_ref(x))
+end
 
-function get_weights(comb::MRC_PSD, x::AbstractMatrix{T}) where T<:Number
+function get_weights(comb::MRC_PSD, x::AbstractMatrix{T}) where {T <: Number}
     w = Vector{T}(undef, size(x, 2))
     for (i, s) in enumerate(eachcol(x))
-        w[i] = estimate_snr(s, fs=comb.fs)
+        w[i] = estimate_snr(s, fs = comb.fs)
     end
     return w
 end
@@ -68,7 +70,7 @@ function combiner(comb::CorPol, x::AbstractMatrix{<:Number})
     return polarity_flip(x) * w
 end
 
-combiner(comb::EGC, x::AbstractMatrix{<:Number}) = sum(polarity_flip(x), dims=2) |> vec
+combiner(comb::EGC, x::AbstractMatrix{<:Number}) = sum(polarity_flip(x), dims = 2) |> vec
 
 combiner(x::AbstractMatrix{<:Number}) = combiner(SNR_MAX(), x)
 
