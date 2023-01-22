@@ -1,6 +1,6 @@
 using Base: Number
 using PressureSensitiveMats
-using Test
+using Aqua, Test
 
 @testset "Utils" begin
     ma1, mv1 = moving_stats(ones(5000), 3)
@@ -71,4 +71,10 @@ end
 
     @test md_solei isa BitVector
     @test md_solei == zeros(35000)
+end
+
+@testset "Code Quality" begin
+    Aqua.test_ambiguities(PressureSensitiveMats, recursive=false)
+    # Aqua.test_all includes Base and Core in ambiguity testing
+    Aqua.test_all(PressureSensitiveMats, ambiguities=false)
 end

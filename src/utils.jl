@@ -1,18 +1,18 @@
 # Utility functions
 
 ord = [
-	21, 17, 13, 
-	9, 5, 1, 
-	22, 18, 14,
-	10, 6, 2,
-	23, 19, 15,
-	11, 7, 3, 
-	24, 20, 16, 
-	12, 8, 4]
+    21, 17, 13,
+    9, 5, 1,
+    22, 18, 14,
+    10, 6, 2,
+    23, 19, 15,
+    11, 7, 3,
+    24, 20, 16,
+    12, 8, 4]
 
-function estimate_snr(x::AbstractVector{<:Number}; fs::Real=10)
+function estimate_snr(x::AbstractVector{<:Number}; fs::Real = 10)
     # Estimate SNR for a 30-102.4s segment
-    pow = power(periodogram(x, nfft=1024, window=hanning))
+    pow = power(periodogram(x, nfft = 1024, window = hanning))
     ps = argmax(pow)
     n = mean(pow[Not(ps, 2ps)]) * 0.73
     w = (pow[ps] * fs / 1024 - n) / n
@@ -24,14 +24,14 @@ end
 
 Return moving average and variance of x using a window length L
 """
-function moving_stats(x::AbstractVector{T}, L::Integer) where T
+function moving_stats(x::AbstractVector{T}, L::Integer) where {T}
     # Use filters to calculate running mean and var
     avg_filt = ones(T, L) ./ L
     var_filt = ones(T, L) ./ (L - 1) # unbiased
-    
+
     moving_avg = filt(avg_filt, 1, x)
     moving_var = filt(var_filt, 1, (x .- moving_avg) .^ 2)
-    
+
     return moving_avg, moving_var
 end
 
@@ -40,13 +40,14 @@ end
 
 Return moving average and variance of x using a window lengths w
 """
-function moving_stats(x::AbstractVector{T}, w::AbstractVector{<:Integer}) where T
+function moving_stats(x::AbstractVector{T}, w::AbstractVector{<:Integer}) where {T}
     moving_avg = zeros(T, length(x))
     moving_var = zeros(T, length(x))
     @views for i in eachindex(x)
         win = i < w[i] ? i : w[i]
-        moving_avg[i] = mean(x[i-win+1:i])
-        moving_var[i] = sum((x[i-win+1:i] .- moving_avg[i-win+1:i]) .^ 2) / (w[i]-1)
+        moving_avg[i] = mean(x[(i - win + 1):i])
+        moving_var[i] = sum((x[(i - win + 1):i] .- moving_avg[(i - win + 1):i]) .^ 2) /
+                        (w[i] - 1)
     end
     return moving_avg, moving_var
 end
@@ -56,15 +57,15 @@ end
 
 Convenience function to apply a function f to segments of length n to the matrix x.
 """
-function apply2seg(f::Function, x::AbstractMatrix{T} , n::Integer) where T<:Number
+function apply2seg(f::Function, x::AbstractMatrix{T}, n::Integer) where {T <: Number}
     # Assumes a mat comes in and a vec goes out
     # Not much better than a mapreduce but it includes last segment
-    ra = 1:n:size(x, 1)-n
+    ra = 1:n:(size(x, 1) - n)
     out = Vector{T}(undef, size(x, 1))
     for i in ra
-        out[i:i+n-1] = f(@view x[i:i+n-1, :])
+        out[i:(i + n - 1)] = f(@view x[i:(i + n - 1), :])
     end
-    out[ra.stop+n:end] = f(@view x[ra.stop+n:end, :])
+    out[(ra.stop + n):end] = f(@view x[(ra.stop + n):end, :])
     return out
 end
 
@@ -73,12 +74,12 @@ end
 
 Reorders the columns of a matrix to be in the proper sensor order.
 """
-function mat_shape(x::AbstractVector{<:Number}, n::Integer=3)
-    return view(x, mapreduce(i -> ord .+ (24 * i), vcat, 0:n-1))
+function mat_shape(x::AbstractVector{<:Number}, n::Integer = 3)
+    return view(x, mapreduce(i -> ord .+ (24 * i), vcat, 0:(n - 1)))
 end
 
-function mat_shape(x::AbstractMatrix{<:Number}, n::Integer=3)
-    return view(x, :, mapreduce(i -> ord .+ (24 * i), vcat, 0:n-1))
+function mat_shape(x::AbstractMatrix{<:Number}, n::Integer = 3)
+    return view(x, :, mapreduce(i -> ord .+ (24 * i), vcat, 0:(n - 1)))
 end
 
 """
@@ -89,9 +90,9 @@ ex. Nx72 -> 9x8xN
 
 ex. Nx24 -> 3x8xN
 """
-function reshape_psm(x::AbstractMatrix{<:Number}, n::Integer=div(size(x, 2), 24))
-	new_shape = reshape(mat_shape(x, n)', 3, 8, n, :) 
-	return reduce(vcat, eachslice(new_shape, dims=3))
+function reshape_psm(x::AbstractMatrix{<:Number}, n::Integer = div(size(x, 2), 24))
+    new_shape = reshape(mat_shape(x, n)', 3, 8, n, :)
+    return reduce(vcat, eachslice(new_shape, dims = 3))
 end
 
 """
@@ -99,7 +100,9 @@ end
 
     Return the indices of sensors whose mean value is greater than thresh.
 """
-active_sensors(x::AbstractMatrix{<:Number}, thresh::Real=0.4*2046) = vec(mean(x, dims=1) .> thresh)
+function active_sensors(x::AbstractMatrix{<:Number}, thresh::Real = 0.4 * 2046)
+    vec(mean(x, dims = 1) .> thresh)
+end
 
 """
     choose_ref(x)
@@ -108,7 +111,7 @@ Return the index of the sensor with the greatest power.
 """
 function choose_ref(x::AbstractMatrix{<:Number})
     # Choose 
-    out = sum(abs2, x, dims=1) |> argmax
+    out = sum(abs2, x, dims = 1) |> argmax
     return out[2]
 end
 
@@ -119,7 +122,9 @@ extract_ref(x::AbstractMatrix{<:Number}) = x[:, choose_ref(x)]
 
 Flips the polarity of sensors based on their PCC with the reference sensor.
 """
-polarity_flip(x::AbstractVecOrMat{<:Number}) = sign.(cor(x, @view x[:, choose_ref(x)]))' .* x
+function polarity_flip(x::AbstractVecOrMat{<:Number})
+    sign.(cor(x, @view x[:, choose_ref(x)]))' .* x
+end
 
 """
     sfm(x)
@@ -136,9 +141,9 @@ end
 Return the indices of sensors with a mean spectral flatness measure, taken in segments of
 length n, above the threshold in dB.
 """
-function active_sfm(x::AbstractMatrix{<:Number}, n::Integer, thresh::Real=-50)
-    fo(sig) = mapreduce(i -> sfm(sig[i:i+n-1]), vcat, 1:n:size(x, 1)-n)
+function active_sfm(x::AbstractMatrix{<:Number}, n::Integer, thresh::Real = -50)
+    fo(sig) = mapreduce(i -> sfm(sig[i:(i + n - 1)]), vcat, 1:n:(size(x, 1) - n))
     s = mapreduce(fo, hcat, eachcol(x))
     actives = pow2db.(s) .> thresh
-    return vec(mean(actives, dims=1) .> 0.4)
+    return vec(mean(actives, dims = 1) .> 0.4)
 end
