@@ -24,7 +24,7 @@ end
 
 Return moving average and variance of x using a window length L
 """
-function moving_stats(x::AbstractVector{T}, L::Integer) where {T}
+function moving_stats(x::AbstractVector{T <: Number}, L::Integer) where {T}
     # Use filters to calculate running mean and var
     avg_filt = ones(T, L) ./ L
     var_filt = ones(T, L) ./ (L - 1) # unbiased
@@ -40,7 +40,8 @@ end
 
 Return moving average and variance of x using a window lengths w
 """
-function moving_stats(x::AbstractVector{T}, w::AbstractVector{<:Integer}) where {T}
+function moving_stats(x::AbstractVector{T <: Number},
+                      w::AbstractVector{<:Integer}) where {T}
     moving_avg = zeros(T, length(x))
     moving_var = zeros(T, length(x))
     @views for i in eachindex(x)
@@ -57,7 +58,8 @@ end
 
 Convenience function to apply a function f to segments of length n to the matrix x.
 """
-function apply2seg(f::Function, x::AbstractMatrix{T}, n::Integer) where {T <: Number}
+function apply2seg(f::Function, x::AbstractMatrix{T <: Number},
+                   n::Integer) where {T <: Number}
     # Assumes a mat comes in and a vec goes out
     # Not much better than a mapreduce but it includes last segment
     ra = 1:n:(size(x, 1) - n)
