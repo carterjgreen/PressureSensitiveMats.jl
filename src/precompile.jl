@@ -1,4 +1,4 @@
-@precompile_setup begin
+@setup_workload begin
     truth = [21 9 22 10 23 11 24 12
              17 5 18 6 19 7 20 8
              13 1 14 2 15 3 16 4
@@ -11,7 +11,7 @@
     single = fill(313.0, 35000) .+ randn(35000)
     multi = fill(313.0, (35000, 72)) .+ randn((35000, 72))
 
-    @precompile_all_calls begin
+    @compile_workload begin
         # Utils
         moving_stats(ones(5000), 3)
         moving_stats(ones(5000), fill(3, 5000))
