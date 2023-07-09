@@ -35,6 +35,15 @@ using Aqua, Test
     @test reshape_psm(ones(Int, 400, 72) .* (1:72)')[:, :, rand(1:72)] == truth
 end
 
+@testset "Breathing Rate" begin
+    breath = cos.(2π * 12 / 60 / 10 .* collect(1000:4001))
+
+    @test 11.5 < est_br(breath) < 12.5
+    @test 11.8 < est_br_fft(breath) < 12.2
+    @test 11.8 < est_br_fft2(breath) < 12.2
+
+end
+
 @testset "Combiners" begin
     multi = fill(313.0, (35000, 72)) .+ randn((35000, 72))
 
@@ -79,12 +88,17 @@ end
     single = fill(313.0, 35000) .+ randn(35000)
     multi = fill(313.0, (35000, 72)) .+ randn((35000, 72))
 
+    single2 = copy(single)
+    single2[1000:1200] .+= 1000
+
     md_s = move_detect(single, min_samples = 10)
+    md_s2 = move_detect(single2, min_samples = 10)
     md_m = move_detect(multi, min_samples = 10)
     md_solei = move_detect(Solei(), single, min_samples = 10)
 
     @test md_s isa BitVector
     @test md_s == zeros(35000)
+    @test sum(md_s2) == 301
 
     @test md_m isa BitVector
     @test md_m == zeros(35000)
