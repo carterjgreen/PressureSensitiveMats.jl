@@ -23,6 +23,6 @@ makedocs(;
 )
 
 deploydocs(;
-    repo="github.com/carterjgreen/PressureSensitiveMats.jl",
+    repo="github.com/carterjgreen/PressureSensitiveMats.jl.git",
     devbranch = "main",
 )
