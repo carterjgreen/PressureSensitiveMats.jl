@@ -63,6 +63,7 @@ end
     @test combiner(SNR_MAX(), multi, 5) isa AbstractVector{<:Number}
     @test apply2seg(s -> combiner(MRC_PSD(), s), multi, 300) isa AbstractVector{<:Number}
     @test apply2seg(s -> combiner(MRC_PSD(10), s), multi, 300) isa AbstractVector{<:Number}
+    @test apply2seg(s -> mrc(s, 10), multi, 300) isa AbstractVector{<:Number}
 end
 
 @testset "Occupancy Detection" begin
