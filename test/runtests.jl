@@ -16,6 +16,8 @@ using Aqua, Test
              65 53 66 54 67 55 68 56
              61 49 62 50 63 51 64 52]
 
+    active = hcat(fill(1000, 40), zeros(40))
+
     @test ma1[3:end] ≈ ones(4998)
     @test mv1[5:end] ≈ zeros(4996)
 
@@ -27,6 +29,8 @@ using Aqua, Test
 
     @test sfm(zeros(512)) isa Number
     @test active_sfm(randn(35000, 72), 300) isa AbstractVector
+    @test active_sensors(active) == Bool[1, 0]
+    @test extract_ref(active) == active[:, 1]
 
     @test reshape_psm(ones(Int, 400, 72) .* (1:72)')[:, :, rand(1:72)] == truth
 end
@@ -35,23 +39,40 @@ end
     multi = fill(313.0, (35000, 72)) .+ randn((35000, 72))
 
     @test combiner(SNR_MAX(), multi) isa AbstractVector{<:Number}
+    @test snrmax(multi) == combiner(SNR_MAX(), multi)
+    @test combiner(multi) == combiner(SNR_MAX(), multi)
+
     @test combiner(PCC(), multi) isa AbstractVector{<:Number}
     @test combiner(PCC2(), multi) isa AbstractVector{<:Number}
+    @test pcc(multi) == combiner(PCC2(), multi)
+    
     @test combiner(EGC(), multi) isa AbstractVector{<:Number}
+    @test egc(multi) == combiner(EGC(), multi)
+
+    @test selection(multi) isa AbstractVector{<:Number}
+
+    @test combiner(SNR_MAX(), multi, 5) isa AbstractVector{<:Number}
+    @test apply2seg(s -> combiner(MRC_PSD(), s), multi, 300) isa AbstractVector{<:Number}
     @test apply2seg(s -> combiner(MRC_PSD(10), s), multi, 300) isa AbstractVector{<:Number}
 end
 
 @testset "Occupancy Detection" begin
     multi = fill(313.0, (35000, 72)) .+ randn((35000, 72))
+    multi2 = copy(multi)
+    multi2[1000:4000, :] .= 2000.
 
     multi_occ = occupancy_detection(multi)
+    multi_occ2 = occupancy_detection(multi2)
     multi_occ_dist = occupancy_detection(multi, max_dist = true)
+    multi_occ_dist2 = occupancy_detection(multi2, max_dist = true)
 
     @test multi_occ isa BitVector
     @test multi_occ == zeros(35000)
+    @test sum(multi_occ2) == 3001
 
     @test multi_occ_dist isa BitVector
     @test multi_occ_dist == zeros(35000)
+    @test multi_occ_dist2 !=  multi_occ2 # can tell that it's not real
 end
 
 @testset "Motion Detection" begin
