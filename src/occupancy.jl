@@ -35,7 +35,7 @@ function breath_availability(x::AbstractArray{T, 3}) where {T <: Number}
     for i in eachindex(out)
         active = findall(view(x, :, :, i) .> (2046 * 0.4))
         if !isempty(active)
-            out[i] = pairwise(Euclidean(), Tuple.(active)) |> maximum
+            out[i] = maximum(pairwise(Euclidean(), Tuple.(active)))
         else
             out[i] = Inf
         end
@@ -55,7 +55,7 @@ Unobtrusive Pressure Sensor Arrays - 2018, Soleimani.
  - `n=4` : Sensitivity parameter
 """
 function occupancy_detection(x::AbstractVector{<:Number}; β::Real = 350, m::Integer = 300,
-                             n::Real = 4)
+    n::Real = 4)
     τ = cityblock(extrema(x)...) / n # Sareh uses n=4 in her code
     occupancy = (x .> (β + τ))
     return any(occupancy) ? min_occupancy(occupancy, m) : occupancy
@@ -74,8 +74,8 @@ Pressure Sensor Arrays - 2018, Soleimani.
  - `n=4` : Sensitivity parameter
 """
 function occupancy_detection(x::AbstractMatrix{<:Number}; max_dist::Bool = false,
-                             β::Real = 25000, m::Integer = 300, n::Real = 4)
-    Z = sum(x, dims = 2) |> vec
+    β::Real = 25000, m::Integer = 300, n::Real = 4)
+    Z = vec(sum(x; dims = 2))
     τ = cityblock(extrema(Z)...) / n # Sareh uses n=4 in her code
 
     if max_dist # Sareh's post-processing

@@ -1,7 +1,6 @@
 # Utility functions
 
-ord = [
-    21, 17, 13,
+ord = [21, 17, 13,
     9, 5, 1,
     22, 18, 14,
     10, 6, 2,
@@ -12,7 +11,7 @@ ord = [
 
 function estimate_snr(x::AbstractVector{<:Number}; fs::Real = 10)
     # Estimate SNR for a 30-102.4s segment
-    pow = power(periodogram(x, nfft = 1024, window = hanning))
+    pow = power(periodogram(x; nfft = 1024, window = hanning))
     ps = argmax(pow)
     n = mean(pow[Not(ps, 2ps)]) * 0.73
     w = (pow[ps] * fs / 1024 - n) / n
@@ -41,7 +40,7 @@ end
 Return moving average and variance of x using a window lengths w
 """
 function moving_stats(x::AbstractVector{T},
-                      w::AbstractVector{<:Integer}) where {T <: Number}
+    w::AbstractVector{<:Integer}) where {T <: Number}
     moving_avg = zeros(T, length(x))
     moving_var = zeros(T, length(x))
     @views for i in eachindex(x)
@@ -59,7 +58,7 @@ end
 Convenience function to apply a function f to segments of length n to the matrix x.
 """
 function apply2seg(f::Function, x::AbstractMatrix{T},
-                   n::Integer) where {T <: Number}
+    n::Integer) where {T <: Number}
     # Assumes a mat comes in and a vec goes out
     # Not much better than a mapreduce but it includes last segment
     ra = 1:n:(size(x, 1) - n)
@@ -94,7 +93,7 @@ ex. Nx24 -> 3x8xN
 """
 function reshape_psm(x::AbstractMatrix{<:Number}, n::Integer = div(size(x, 2), 24))
     new_shape = reshape(mat_shape(x, n)', 3, 8, n, :)
-    return reduce(vcat, eachslice(new_shape, dims = 3))
+    return reduce(vcat, eachslice(new_shape; dims = 3))
 end
 
 """
@@ -103,7 +102,7 @@ end
     Return the indices of sensors whose mean value is greater than thresh.
 """
 function active_sensors(x::AbstractMatrix{<:Number}, thresh::Real = 0.4 * 2046)
-    vec(mean(x, dims = 1) .> thresh)
+    return vec(mean(x; dims = 1) .> thresh)
 end
 
 """
@@ -113,7 +112,7 @@ Return the index of the sensor with the greatest power.
 """
 function choose_ref(x::AbstractMatrix{<:Number})
     # Choose 
-    out = sum(abs2, x, dims = 1) |> argmax
+    out = argmax(sum(abs2, x; dims = 1))
     return out[2]
 end
 
@@ -125,7 +124,7 @@ extract_ref(x::AbstractMatrix{<:Number}) = x[:, choose_ref(x)]
 Flips the polarity of sensors based on their PCC with the reference sensor.
 """
 function polarity_flip(x::AbstractVecOrMat{<:Number})
-    sign.(cor(x, @view x[:, choose_ref(x)]))' .* x
+    return sign.(cor(x, @view x[:, choose_ref(x)]))' .* x
 end
 
 """
@@ -147,5 +146,5 @@ function active_sfm(x::AbstractMatrix{<:Number}, n::Integer, thresh::Real = -50)
     fo(sig) = mapreduce(i -> sfm(sig[i:(i + n - 1)]), vcat, 1:n:(size(x, 1) - n))
     s = mapreduce(fo, hcat, eachcol(x))
     actives = pow2db.(s) .> thresh
-    return vec(mean(actives, dims = 1) .> 0.4)
+    return vec(mean(actives; dims = 1) .> 0.4)
 end

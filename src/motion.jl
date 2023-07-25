@@ -30,7 +30,7 @@ Function to calculate window sizes based on location of peaks in a combined PSM 
  - `thresh=100` : Minimum peak magnitude threshold.
 """
 function window_sizes(x::AbstractVector{<:Number}, w_max::Integer = 300,
-                      thresh::Number = 100)
+    thresh::Number = 100)
     windows = fill(w_max, length(x))
     inds = argmaxima(x, 20)
     filter!(i -> x[i] > thresh, inds)
@@ -57,7 +57,7 @@ Pressure Sensor Array - 2006, Holtzman.
 
 """
 function move_detect(::Holtz, x::AbstractVector{<:Number}; L::Integer = 300, κ::Real = 3,
-                     min_samples::Integer = 3)
+    min_samples::Integer = 3)
     # Movement detection from Holtzman, 2006
     onset = falses(length(x))
     offset = falses(length(x))
@@ -88,15 +88,15 @@ function move_detect(::Holtz, x::AbstractVector{<:Number}; L::Integer = 300, κ:
 end
 
 function move_detect(x::AbstractMatrix{<:Number}; L::Integer = 300, κ::Real = 3,
-                     min_samples::Integer = 3)
+    min_samples::Integer = 3)
     out = falses(size(x))
     if mean(occupancy_detection(x)) > 0.75
         for (i, col) in enumerate(eachcol(x))
             # Apply detection on each column/sensor
-            out[:, i] = move_detect(Holtz(), col, L = L, κ = κ, min_samples = min_samples)
+            out[:, i] = move_detect(Holtz(), col; L = L, κ = κ, min_samples = min_samples)
         end
     end
-    return vec(sum(out, dims = 2)) .>= 2
+    return vec(sum(out; dims = 2)) .>= 2
 end
 
 """
@@ -115,9 +115,9 @@ Unobtrusive Bed-based Pressure-Sensor Array - 2017, Soleimani
 
 """
 function move_detect(::Solei,
-                     x::AbstractVector{<:Number};
-                     α::Real = -0.029, κ::Integer = 3, min_samples::Integer = 2,
-                     height::Real = 50, weight::Real = 50)
+    x::AbstractVector{<:Number};
+    α::Real = -0.029, κ::Integer = 3, min_samples::Integer = 2,
+    height::Real = 50, weight::Real = 50)
     # Movement detection from Soleimani, 2017
     # Expects reference sensor that is band-pass filtered
     # Set height and weight to 50 to ignore the last threshold

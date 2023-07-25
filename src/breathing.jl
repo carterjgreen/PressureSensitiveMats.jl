@@ -16,6 +16,6 @@ end
 
 function est_br_fft2(x::AbstractVector{<:Number}, fs = 10)
     # using periodogram, not accurate
-    s = periodogram(x, fs = fs)
+    s = periodogram(x; fs = fs)
     return freq(s)[argmax(power(s))] * 60
 end
